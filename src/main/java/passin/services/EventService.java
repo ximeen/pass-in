@@ -1,30 +1,31 @@
 package passin.services;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import passin.domain.attendee.Attendee;
 import passin.domain.event.Event;
+import passin.domain.event.exceptions.eventNotFoundException;
 import passin.dto.event.EventIdDTO;
 import passin.dto.event.EventRequestDTO;
 import passin.dto.event.EventResponseDTO;
-import passin.repositories.AttendeeRepository;
 import passin.repositories.EventRepository;
 
 import java.text.Normalizer;
 import java.util.List;
 
 @Service
-@Data
+@RequiredArgsConstructor
 public class EventService {
     private final EventRepository eventRepository;
-    private final AttendeeRepository attendeeRepository;
+    private final AttendeeService attendeeService;
 
     public EventResponseDTO getEventDetails(String eventId){
         Event event = this.eventRepository
                 .findById(eventId)
-                .orElseThrow(()-> new RuntimeException("Event not found with Id:" + eventId));
+                .orElseThrow(()-> new eventNotFoundException("Event not found with Id:" + eventId));
 
-        List<Attendee> attendeeList = this.attendeeRepository.findEventById(eventId);
+        List<Attendee> attendeeList = this.attendeeService.getAllAttendeesFromEvents(eventId);
 
         return new EventResponseDTO(event, attendeeList.size());
     }
