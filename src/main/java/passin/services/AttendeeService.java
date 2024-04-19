@@ -1,9 +1,9 @@
 package passin.services;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import passin.domain.attendee.Attendee;
+import passin.domain.attendee.exceptions.AttendeeAlreadyExistException;
 import passin.domain.checkin.CheckIn;
 import passin.dto.attendee.AttendeeDetails;
 import passin.dto.attendee.AttendeesListResponseDTO;
@@ -17,11 +17,11 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class AttendeeService {
-    private final AttendeeRepository repository;
+    private final AttendeeRepository attendeeRepository;
     private final CheckInRepository checkInRepository;
 
     public List<Attendee> getAllAttendeesFromEvents(String eventId){
-        return this.repository.findEventById(eventId);
+        return this.attendeeRepository.findEventById(eventId);
     }
 
     public AttendeesListResponseDTO getEventAttendees(String eventId){
@@ -34,5 +34,14 @@ public class AttendeeService {
         }).toList();
 
         return new AttendeesListResponseDTO(attendeeDetailsList);
+     }
+
+     public void verifyAttendeeSubscription(String email, String eventId){
+        Optional<Attendee> isAttendeeRegister = this.attendeeRepository.findByEventIdAndEmail(eventId, email);
+        if(isAttendeeRegister.isPresent())throw new AttendeeAlreadyExistException("Attendee is already registered");
+     }
+
+     public Attendee registerAttendee(Attendee newAttendee){
+        return this.attendeeRepository.save(newAttendee);
      }
 }
