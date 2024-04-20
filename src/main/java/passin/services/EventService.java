@@ -50,7 +50,7 @@ public class EventService {
         Attendee newAttendee = new Attendee();
         newAttendee.setName(attendeeRequestDTO.name());
         newAttendee.setEmail(attendeeRequestDTO.email());
-        newAttendee.setEventId(event);
+        newAttendee.setEvent(event);
         newAttendee.setCreatedAt(LocalDateTime.now());
         this.attendeeService.registerAttendee(newAttendee);
         return new AttendeeIdDTO(newAttendee.getId());
